@@ -1,0 +1,12 @@
+---
+layout: post
+title:  "开摊大吉!"
+date:   2017-02-17
+categories: 开摊
+---
+
+“臭豆腐啦，好吃新鲜的臭豆腐啦！走过路过，不要错过！”
+
+“老板，臭豆腐怎么卖？”
+
+“不要钱！只要点进 [STFFE](https://github.com/STFFE/stffe.github.com) 这里，一个 star 一碗啦!”

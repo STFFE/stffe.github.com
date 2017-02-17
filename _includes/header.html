@@ -1,0 +1,52 @@
+<header class="header">
+	<div class="header-container">
+		<div class="logo-wrapper">
+			<img class="logo" src="/images/logo.png" alt="logo">
+
+			<h1 class="team-name">
+				臭豆腐前端 - STFFE
+			</h1>
+		</div>
+		<div class="nav">
+			<ul>
+				{% if page.path == "index.html" %}
+					<li class="title">
+						<a href="/index.html">首页</a>
+					</li>
+				{% else %}
+					<li>
+						<a href="/index.html">首页</a>
+					</li>
+				{% endif %}
+				{% if page.path == "archive.html" %}
+					<li class="title">
+						<a href="/archive.html">文章</a>
+					</li>
+				{% else %}
+					<li>
+						<a href="/archive.html">文章</a>
+					</li>
+				{% endif %}
+				{% if page.path == "category.html" %}
+					<li class="title">
+						<a href="/category.html">分类</a>
+					</li>
+				{% else %}
+					<li>
+						<a href="/category.html">分类</a>
+					</li>
+				{% endif %}
+				{% if page.path == "about.html" %}
+					<li class="title">
+						<a href="/about.html">关于</a>
+					</li>
+				{% else %}
+					<li>
+						<a href="/about.html">关于</a>
+					</li>
+				{% endif %}
+			</ul>
+		</div>
+		<div class="description"> {{ site.motto }} </div>
+	</div>
+</header>

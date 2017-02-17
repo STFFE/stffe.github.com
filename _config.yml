@@ -1,0 +1,12 @@
+# Site settings
+title: STFFE - Stinky Tofu Front-End Blog
+motto: 「Stinky Tofu Front-End ~ 前端是工作，臭豆腐是生活，对于我们，缺一不可。我们在星城，倾听世界 。」
+email: your-email@domain.com
+description: > # 「Stinky Tofu Front-End ~ 前端是工作，臭豆腐是生活，对于我们，缺一不可。我们在星城，倾听世界 。」
+baseurl: "" # the subpath of your site, e.g. /blog/
+url: "http://stffe.github.com" # the base hostname & protocol for your site
+twitter_username: stffe
+github_username:  stffe
+
+# Build settings
+markdown: kramdown

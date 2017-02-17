@@ -1,0 +1,227 @@
+html,body {
+	-moz-osx-font-smoothing: grayscale;
+}
+
+/**
+ * Header
+ */
+.header {
+    padding: 20px 20px 40px 20px;
+    background-color: #333c4c;
+}
+
+.header-container {
+    max-width: 700px;
+    margin: 0px auto;
+}
+
+.logo-wrapper {
+	margin-bottom: 15px;
+
+	.logo {
+		width: 90px;
+    margin-left: -15px;
+	}
+
+	.team-name {
+		display: inline-block;
+		margin: 0;
+    color: white;
+    vertical-align: middle;
+	}
+}
+
+.nav {
+	color: #707070;
+	text-transform: uppercase;
+    font-size: 16px;
+    font-weight: 600;
+    font-family: "Montserrat",sans-serif;
+    display:inline;
+}
+
+.nav li {
+    padding-right: 20px;
+    display: inline-block;
+    line-height: 1;
+}
+
+.nav ul {
+	margin: 0;
+}
+
+li {
+    margin-left: 0px;
+    line-height: 1.7em;
+}
+
+.nav a {
+    color: #959BA6;
+}
+
+.nav a:link {
+    opacity: 1;
+    transition: all 0.15s linear 0s;
+    text-decoration: none;
+}
+
+.nav li a:visited {
+    opacity: 1;
+    transition: all 0.15s linear 0s;
+    text-decoration: none;
+}
+
+.nav li a:hover {
+    opacity: 0.6;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.title a {
+    color: #FFF;
+}
+
+.title a:link {
+    color: #FFF;
+}
+
+.title a:visited {
+    opacity: 1;
+    transition: all 0.15s linear 0s;
+    text-decoration: none;
+}
+
+.title a:hover {
+    opacity: 1;
+    color: #FFF;
+}
+
+.description {
+    padding: 15px 0 0 0;
+    font-size: 12px;
+    line-height: 1.5em;
+    color: #EEE;
+}
+
+.social-links {
+    padding-top: 10px;
+	margin-left: 0px;
+}
+
+.social-links li {
+    display: inline;
+    padding-right: 10px;
+    line-height: 0;
+}
+
+.social-links a {
+    color: #959BA6;
+}
+
+.social-links a:active {
+	opacity: 0.6;
+}
+
+.social-links a:hover {
+	opacity: 0.6;
+}
+
+.page-content {
+	min-height: 100%;
+	height: 100%;
+}
+
+.post-meta {
+	color: #a29797;
+	font-size: 14px;
+	margin: 20px 3px;
+}
+
+.content {
+	margin-top: 20px;
+	color: #666;
+	font-size: 14px;
+}
+
+.post-list {
+	list-style:none;
+}
+
+.post-list li h3 {
+	margin-bottom: 5px;
+	font-weight: 500px;
+}
+
+.post-list li a {
+	color: #29abd8;
+}
+
+.post-header {
+	margin-top: 30px;
+}
+
+.post-content {
+	line-height: 24px;
+	margin-bottom: 90px;
+}
+
+#line {
+	opacity: 0.2;
+	color: #000;
+}
+
+/**
+ * Artist
+ */
+.well {
+	padding: 22px 30px 0 30px;
+}
+
+.well ul {
+	color: #AAA;
+	font-size: 14px;
+	list-style:none;
+}
+
+.well ul a {
+    text-decoration: none;
+}
+
+.well ul a:hover {
+}
+
+/**
+ * Category
+ */
+ .category-box {
+	font-weight:bold;
+	font-size: 16px;
+ }
+
+
+/**
+ * About
+ */
+.about {
+	padding: 20px 0;
+}
+
+/**
+ * Footer
+ */
+.footer {
+    font-size: 11px;
+    text-align: center;
+	color: #666;
+}
+
+#gotop {
+    position: fixed;
+    right: 20px;
+    bottom: 20px;
+    padding: 10px 15px;
+    font-size: 20px;
+    background: #515865;
+    color: white;
+    cursor: pointer;
+}
