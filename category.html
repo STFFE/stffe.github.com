@@ -13,7 +13,7 @@ layout: default
 <li>
   <span>{{ post.date | date: "%Y.%-m.%-d" }}</span>
   <a href="{{ site.baseurl}}{{ post.url }}">{{ post.title }}</a>
-  <a href="http://{{ post.homepage }}" class="author">{{ post.author }}</>
+  <a href="http://{{ post.homepage }}" class="author">{{ post.author }}</a>
 </li>
 {% endif %}{% endfor %}
 </ul>

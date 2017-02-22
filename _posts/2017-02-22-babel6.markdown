@@ -127,7 +127,3 @@ console.log(userName);
 npm install --save babel-polyfill
 ```
 好啦,就这样吧.哈哈哈.其实最后一步,也就是安装polyfill对于我们wecash闪银来说,是可以不用的,因为我们ie都不用兼容,所以基本上不会有这个问题.
-
-
-
-
