@@ -1,14 +1,11 @@
 ---
 layout: post
-title:  "babel6!"
+title:  "一步一步教你怎么在本地用babel6"
 date:   2017-02-17
 categories: 全栈
 author: "兰悦儿格格"
 ---
-title: 一步一步教你怎么在本地用babel6
-date: 2016-04-05 14:10:27
-tags:
----
+
 之所以要学习babel6是因为想要在项目里用上es6.
 所以就折腾了下.
 一开始,学习es6是直接在浏览器运行的,结果发现我升级到最新的chrome浏览器之后,它对es6的支持只有65%,
