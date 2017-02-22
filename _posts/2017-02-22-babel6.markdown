@@ -1,0 +1,136 @@
+---
+layout: post
+title:  "babel6!"
+date:   2017-02-17
+categories: 全栈
+author: "兰悦儿格格"
+---
+title: 一步一步教你怎么在本地用babel6
+date: 2016-04-05 14:10:27
+tags:
+---
+之所以要学习babel6是因为想要在项目里用上es6.
+所以就折腾了下.
+一开始,学习es6是直接在浏览器运行的,结果发现我升级到最新的chrome浏览器之后,它对es6的支持只有65%,
+所以,发现还是得学babel.
+[找了这个在线转换网站来测试效果](https://babeljs.io/repl/#?experimental=false&evaluate=true&loose=false&spec=false&code=import%20*%20as%20index%20from%20%22index.js%22)
+
+后来觉得老是转太麻烦,而且通过网页去转也太low了吧.
+我们既然要在项目里用es6,那肯定还是得在本地集成这个转换.
+先来看官方定义babel是什么
+Babel 是一个通用的多用途 JavaScript 编译器。通过 Babel 你可以使用（并创建）下一代的 JavaScript，以及下一代的 JavaScript 工具。
+在看怎么安装
+考虑之后,我决定直接用babel6.
+那么就跟着我一步步走上babel之旅吧
+1.新建一个文件夹,这里我取名叫es6
+```
+mkdir es6
+```
+2.进入这个文件夹
+```
+cd es6
+```
+
+3.初始化一个npm的项目.
+```
+npm init
+```
+4.安装babel的核心模块
+```
+npm install -g babel-cli
+```
+注意,本来这里我打算直接用cnpm安装的,结果报错,就还是直接用npm安装了.
+好,babel就装完了.
+不过你不要以为到这里就完了,要想达成在本地编译babel,还有一些其他的事情也是要做的.
+我们有一个叫做test.js的文件,它里面的内容是
+```
+"use strict";
+let userName = "吴晓兰";
+console.log(userName);
+```
+眼下,我们可以试试先来编译我们的babel文件.
+```
+babel test.js
+```
+
+这样就会把test.js的编译结果直接输出终端.
+如果你用
+```
+babel test.js -o testR.js
+```
+就能看到刚才的命令直接把test.js这个文件拷贝成一个新文件,叫做testR.js了.
+但是我们打开testR.js一看,会觉得不对呀,这里面的内容怎么和test.js里的内容是一样的,我们是要编译文件,而不是拷贝文件呀.
+别着急,每次直接在命令行里执行babel命令也太麻烦了,我们直接把我们的构建写到npm scripts里去吧.
+看一下因为在本地执行npm init而生成package.json文件的内容
+```
+{
+  "name": "es61",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}
+```
+找到里面的scripts,可以看到已经有一个叫做test的任务demo,我们给scripts加一个属性,build,加了之后就变成这样了
+```
+{
+  "name": "es61",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "babel test.js -o testR.js"
+  },
+  "author": "",
+  "license": "ISC"
+}
+```
+然后再在node里执行
+```
+npm run build
+```
+ok,这下终于把构建任务写在npm scripts里了.
+但是我们的终极任务还是想在编程的时候直接转换es6的代码嘛,对不对,别着急,这就来了
+由于 Babel 是一个可以用各种花样去使用的通用编译器，因此默认情况下它反而什么都不做。你必须明确地告诉 Babel 应该要做什么。
+那么我们怎么明确告诉babel我们是要干什么呢?
+在项目里建一个.babelrc文件,
+在文件里写上
+```
+{
+    "presets": [
+     "es2015"
+    ],
+    "plugins": []
+  }
+  ```
+然后再执行
+```
+npm install babel-preset-es2015 --save
+```
+
+ok,我们现在再执行npm init build会发现restR.js的文件已经变成了
+```
+"use strict";
+
+var userName = "吴晓兰";
+console.log(userName);
+```
+这正是我们想要的结果.
+但是你以为这就完了么?不,这样是会有隐患的.
+请注意,babel的作用是把es6的语法编译成es5.
+但是比如如果你直接用了一些新的API,它却可能会出错了.因为有一些API,它并不会编译..
+为了解决这个问题,我们可以使用一种叫做Polyfill的技术,简单的说,polyfill是在当前运行环境里用来复制或者说模拟尚不存在的原声api的代码.
+那么,你可以安装这个插件
+```
+npm install --save babel-polyfill
+```
+好啦,就这样吧.哈哈哈.其实最后一步,也就是安装polyfill对于我们wecash闪银来说,是可以不用的,因为我们ie都不用兼容,所以基本上不会有这个问题.
+
+
+
+
