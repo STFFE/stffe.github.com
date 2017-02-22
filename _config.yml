@@ -9,4 +9,4 @@ twitter_username: stffe
 github_username:  stffe
 
 # Build settings
-markdown: redcarpet
+markdown: kramdown
