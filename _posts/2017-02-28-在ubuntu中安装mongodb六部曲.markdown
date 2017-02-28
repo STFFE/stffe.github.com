@@ -77,7 +77,9 @@ sudo apt-get install -y mongodb-org
 ```
 
 这里说一句，如果你看官网的话你会发现有好几个包，那么我为什么会让大家只是安装 这个包呢。
+
 官方对 **mongodb-org** 这个包的定义
+
 > A metapackage that will automatically install the four component packages listed below.
 这里就说了。它跟着就会自动安装其他四个包，所以你只要选择，安装这一个包就够了
 另外， **/etc/mongod.conf** 配置文件会默认把你 这个包的 **bind_ip** 设置成 **127.0.0.1** 
