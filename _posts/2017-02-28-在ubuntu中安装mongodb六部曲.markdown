@@ -1,12 +1,12 @@
-# 在ubuntu中安装mongodb 入门
-话说，楼主以前是吃过苦的，之前我因为想学mongodb，所以用我的windows来安装mongodb，结果苦了我了，一整天都没装好。
-可以说，连没都没摸着。
-后来看到同事用自己的linux系列服务器一些字就装好了，我。。。
-所以奉劝大家，要么在windows上直接下载mongodb软件比如**mongoChef Core**,要么，就还是用linux系列比如ubuntu来装吧。
+# 在 ubuntu 中安装 MongoDB 入门
+话说，楼主以前是吃过苦的，之前我因为想学 MongoDB ，所以用我的 windows 来安装 MongoDB ，结果苦了我了，一整天都没装好。<br>
+可以说，连门都没入着。
+后来看到同事用自己的 linux 系列服务器一些字就装好了，我。。。
+所以奉劝大家，要么在 windows 上直接下载 MongoDB 软件比如 **mongoChef Core** ,要么，就还是用 linux 系列比如 ubuntu 来装吧。
 安装某些软件，windows用户伤不起啊。
 
 ## 1. 根据包管理系统来导入公钥
-这里的包管理系统指的就是你的包管理工具是**dpkg**还是**apt**,或者是其他的包管理工具.
+ 这里的包管理系统指的就是你的包管理工具是**dpkg** 还是 **apt** ,或者是其他的包管理工具.
 ```
 sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv EA312927
 ```
@@ -43,17 +43,17 @@ YXy2T09NgATr0A==
 -----END PGP PUBLIC KEY BLOCK-----
 
 
-## 2. 创建MongoDB的一个列表文件（注意，这里系统不同，安装代码也不同）
-如果你的ubuntu系统是**16.04**，执行下面这个就好
+## 2. 创建 MongoDB 的一个列表文件（注意，这里系统不同，安装代码也不同）
+如果你的 ubuntu 系统是 **16.04** ，执行下面这个就好
 ```
 echo "deb http://repo.mongodb.org/apt/ubuntu xenial/mongodb-org/3.2 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-3.2.list
 ```
-但是如果你的系统是**14.04**系列的，那就得执行这个了
+但是如果你的系统是 **14.04** 系列的，那就得执行这个了
 ```
 echo "deb http://repo.mongodb.org/apt/ubuntu trusty/mongodb-org/3.2 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-3.2.list
 ```
 
-想了想，还是把12的也附上吧
+想了想，还是把 12 的也附上吧
 ```
 echo "deb http://repo.mongodb.org/apt/ubuntu precise/mongodb-org/3.2 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-3.2.list
 
@@ -63,19 +63,19 @@ echo "deb http://repo.mongodb.org/apt/ubuntu precise/mongodb-org/3.2 multiverse"
 sudo apt-get update
 ```
 
-## 4. 安装MongoDB包
+## 4. 安装 MongoDB 包
 ```
 sudo apt-get install -y mongodb-org
 ```
 
 这里说一句，如果你看官网的话你会发现有好几个包，那么我为什么会让大家只是安装 这个包呢。
-官方对**mongodb-org**这个包的定义
+官方对 **mongodb-org** 这个包的定义
 > A metapackage that will automatically install the four component packages listed below.
 这里就说了。它跟着就会自动安装其他四个包，所以你只要选择，安装这一个包就够了
-另外，**/etc/mongod.conf**配置文件会默认把你 这个包的**bind_ip**设置成**127.0.0.1**
+另外， **/etc/mongod.conf** 配置文件会默认把你 这个包的 **bind_ip** 设置成 **127.0.0.1** 
 
 ## 5. 创建一个系统服务文件
-在/lib/systemed/system创建一个mongod.service文件，文件内容如下
+在 /lib/systemed/system 创建一个 mongod.service 文件，文件内容如下
 ```
 [Unit]
 Description=High-performance, schema-free document-oriented database
@@ -91,13 +91,13 @@ ExecStart=/usr/bin/mongod --quiet --config /etc/mongod.conf
 WantedBy=multi-user.target
 ```
 
-## 6.运行MongoDB
+## 6.运行 MongoDB 
 ### 开始运行
 ```
 sudo servercie mongod start
 ```
 
-### 验证mongodb是否开启成功
+### 验证 Mongodb 是否开启成功
 在**/var/log/mongodb/mongod.log**查看是否有这么一句话
 ```
 [initandlisten] waiting for connections on port <port>
@@ -107,7 +107,7 @@ sudo servercie mongod start
 ```
 2016-11-21T05:53:34.772-0500 I NETWORK  [initandlisten] waiting for connections on port 27017
 ```
-### 停止mongoDB
+### 停止 MongoDB 
 ```
 sudo service mongod stop
 ```
@@ -117,12 +117,12 @@ sudo service mongod stop
  sudo service mongod restart
 ```
 
-ok。那怎么校验你是否安装成功，mongodb已经能用了呢？
+ok。那怎么校验你是否安装成功，MongoDB 已经能用了呢？
 在你的命令行里输入
 ```
 mongo
 ```
-这个时候当你看到类似这样的输出之后就代表已经ok了
+这个时候当你看到类似这样的输出之后就代表已经 ok 了
 ```
 MongoDB shell version: 3.2.9
 connecting to: test
