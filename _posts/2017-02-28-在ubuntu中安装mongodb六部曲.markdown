@@ -8,7 +8,7 @@ author: "兰悦儿格格"
 
 话说，楼主以前是吃过苦的，之前我因为想学 MongoDB ，所以用我的 windows 来安装 MongoDB ，结果苦了我了，一整天都没装好。
 
-后来看到同事用自己的 linux 系列服务器一些字就装好了，我。。。
+后来看到同事用自己的 linux 系列服务器一下字就装好了，我。。。
 
 所以奉劝大家，要么在 windows 上直接下载 MongoDB 软件比如 **mongoChef Core** ,要么，就还是用 linux 系列比如 ubuntu 来装吧。
 安装某些软件，windows用户伤不起啊。
