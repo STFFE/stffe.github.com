@@ -1,8 +1,19 @@
-# 在 ubuntu 中安装 MongoDB 入门
+---
+layout: post
+title:  "2017-02-28-在ubuntu中安装mongodb六部曲"
+date:   2017-02-28
+categories: DB
+author: "兰悦儿格格"
+---
+
+# 在 ubuntu 中安装 MongoDB 六部曲
 话说，楼主以前是吃过苦的，之前我因为想学 MongoDB ，所以用我的 windows 来安装 MongoDB ，结果苦了我了，一整天都没装好。<br>
-可以说，连门都没入着。
+
 后来看到同事用自己的 linux 系列服务器一些字就装好了，我。。。
-所以奉劝大家，要么在 windows 上直接下载 MongoDB 软件比如 **mongoChef Core** ,要么，就还是用 linux 系列比如 ubuntu 来装吧。
+
+所以奉劝大家，要么在 windows 上直接下载 MongoDB 软件比如 **mongoChef Core** 
+,要么，就还是用 linux 系列比如 ubuntu 来装吧。
+
 安装某些软件，windows用户伤不起啊。
 
 ## 1. 根据包管理系统来导入公钥
