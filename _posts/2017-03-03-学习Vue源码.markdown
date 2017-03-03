@@ -1,0 +1,355 @@
+---
+layout: post
+title:  "2017-03-03-学习Vue.js源码"
+date:   2017-03-03
+categories: Vue
+author: "Fedora"
+homepage: "http://luzuoquan.github.io/2017/03/02/%E5%AD%A6%E4%B9%A0Vue%E6%BA%90%E7%A0%81/"
+---
+### 前言
+Vue.js是目前MVVM框架中比较流行的一种，在之前的项目中也用过Vue+Vuex。在使用的过程中，也是一边看文档一边进行开发。对Vue的了解也仅限官方文档和一些社区上回答，很大程度上是知其然而不知其所以然。所以在项目告一段落之后，决定从Vue的源码入手，学习一下其内部架构。
+
+### Vue源码目录
+目标Vue.js版本是2.0.5  */src目录*
+![源码src目录](http://easyread.nos.netease.com/web/trunk/1488165885109/src.jpg)
+对应的目录分别为    
+`/compiler`、`/core`、`/entries`、`/platforms`、`/server`、`/sfc`、`/shared`
+
+1. **/compiler**目录是编译模版；
+2. **/core**目录是Vue.js的核心(也是后面的重点)；
+3. **/entries**目录是生产打包的入口；
+4. **/platforms**目录是针对核心模块的'平台'模块，platforms目录下暂时只有web目录（在最新的开发目录里面已经有weex目录了）。web目录下有对应的/compiler、/runtime、/server、/util目录；
+5. **/server**目录是处理服务端渲染；
+6. **/sfc**目录处理单文件.vue；
+7. **/shared**目录提供全局用到的工具函数。    
+在刚学习源码时，会对类似  
+```
+export function observe (value: any): Observer | void {
+  if (!isObject(value)) {
+    return
+  }
+ }
+```
+这样函数申明或者变量申明感动疑惑的，可以先了解一下[flow](https://flowtype.org/docs/getting-started.html#_)。
+
+### 独立构建&&运行时构建
+Vue.js从2.0以后开始出现两个不同的构建版本，详情可以查看[官网文档](https://cn.vuejs.org/v2/guide/installation.html#独立构建-vs-运行时构建)。一开始说到这个，是因为从Vue的build命令里面可以看到有7个build版本，这对学习其源码非常有帮助。
+```
+const builds = {
+  // Runtime only (CommonJS). Used by bundlers e.g. Webpack & Browserify
+  'web-runtime-dev': {
+    entry: path.resolve(__dirname, '../src/entries/web-runtime.js'),
+    dest: path.resolve(__dirname, '../dist/vue.common.js'),
+    format: 'cjs',
+    banner
+  },
+  // runtime-only build for CDN
+  'web-runtime-cdn-dev': {
+    entry: path.resolve(__dirname, '../src/entries/web-runtime.js'),
+    dest: path.resolve(__dirname, '../dist/vue.runtime.js'),
+    format: 'umd',
+    banner
+  },
+  // runtime-only production build for CDN
+  'web-runtime-cdn-prod': {
+    entry: path.resolve(__dirname, '../src/entries/web-runtime.js'),
+    dest: path.resolve(__dirname, '../dist/vue.runtime.min.js'),
+    format: 'umd',
+    env: 'production',
+    banner
+  },
+  // Runtime+compiler standalone development build.
+  'web-standalone-dev': {
+    entry: path.resolve(__dirname, '../src/entries/web-runtime-with-compiler.js'),
+    dest: path.resolve(__dirname, '../dist/vue.js'),
+    format: 'umd',
+    env: 'development',
+    banner,
+    alias: {
+      he: './entity-decoder'
+    }
+  },
+  // Runtime+compiler standalone production build.
+  'web-standalone-prod': {
+    entry: path.resolve(__dirname, '../src/entries/web-runtime-with-compiler.js'),
+    dest: path.resolve(__dirname, '../dist/vue.min.js'),
+    format: 'umd',
+    env: 'production',
+    banner,
+    alias: {
+      he: './entity-decoder'
+    }
+  },
+  // Web compiler (CommonJS).
+  'web-compiler': {
+    entry: path.resolve(__dirname, '../src/entries/web-compiler.js'),
+    dest: path.resolve(__dirname, '../packages/vue-template-compiler/build.js'),
+    format: 'cjs',
+    external: ['he', 'de-indent']
+  },
+  // Web server renderer (CommonJS).
+  'web-server-renderer': {
+    entry: path.resolve(__dirname, '../src/entries/web-server-renderer.js'),
+    dest: path.resolve(__dirname, '../packages/vue-server-renderer/build.js'),
+    format: 'cjs',
+    external: ['stream', 'module', 'vm', 'he', 'de-indent']
+  }
+}
+```
+这里，关注的重点是runtime的版本。
+
+### Vue.js结构
+通过上面的分析，可以看到Vue.js的组成是由core+对应的‘平台’补充代码构成（独立构建和运行时构建只是platforms下web平台的两种选择）。
+![Vue.js结构](https://easyread.nosdn.127.net/web/trunk/1488180276055/vue.jpg)   
+core目录下面对应的`components`、`global-api`、`instance`、`observer`、`util`、`vdom`模块。
+> Vue.js的目标是通过尽可能简单的API实现**响应的数据绑定**和**组合的视图组件**
+
+Vue2.0在保持实现‘响应的数据绑定’的同时又引入了'virtual-dom',那么它是怎么实现的呢？
+
+### 响应的数据绑定
+Vue.js实现数据绑定的关键是**Object.defineProperty(obj, prop, descriptor)**，这也是为什么2.0不支持IE8原因之一，IE8下无法实现defineProperty的腻子脚本。当然实现类似功能的现代语法还有*Object.observe*(已经废弃)和Proxy。     
+Vue源码对此实现的逻辑在core/observer目录下。
+关注三个类**class Observer**,**class Dep**,**class Watcher**     
+**class Observer**在core/observer/index.js中
+```
+export class Observer {
+  value: any;
+  dep: Dep;
+  vmCount: number; // number of vms that has this object as root $data
+
+  constructor (value: any) {
+    this.value = value
+    this.dep = new Dep()
+    this.vmCount = 0
+    def(value, '__ob__', this)
+    if (Array.isArray(value)) {
+      const augment = hasProto
+        ? protoAugment
+        : copyAugment
+      augment(value, arrayMethods, arrayKeys)
+      this.observeArray(value)
+    } else {
+      this.walk(value)
+    }
+  }
+  walk (obj: Object) {
+    const keys = Object.keys(obj)
+    for (let i = 0; i < keys.length; i++) {
+      defineReactive(obj, keys[i], obj[keys[i]])
+    }
+  }
+  observeArray (items: Array<any>) {
+    for (let i = 0, l = items.length; i < l; i++) {
+      observe(items[i])
+    }
+  }
+}
+```
+Observer类实例是用来附加到每个被观察的对象（后面称之为响应式对象）上的。普通对象通常是不会变成‘响应式对象’的。经过**defineReactive**函数的调用,才会将传入的普通对象变成‘响应式对象’。而**defineReactive**就是利用了**Object.defineProperty**这个方法。**defineReactive**源码如下：
+```
+export function defineReactive (
+  obj: Object,
+  key: string,
+  val: any,
+  customSetter?: Function
+) {
+  const dep = new Dep()
+
+  const property = Object.getOwnPropertyDescriptor(obj, key)
+  if (property && property.configurable === false) {
+    return
+  }
+  const getter = property && property.get
+  const setter = property && property.set
+
+  let childOb = observe(val)
+  Object.defineProperty(obj, key, {
+    enumerable: true,
+    configurable: true,
+    get: function reactiveGetter () {
+      const value = getter ? getter.call(obj) : val
+      if (Dep.target) {
+        dep.depend()
+        if (childOb) {
+          childOb.dep.depend()
+        }
+        if (Array.isArray(value)) {
+          dependArray(value)
+        }
+      }
+      return value
+    },
+    set: function reactiveSetter (newVal) {
+      const value = getter ? getter.call(obj) : val
+      if (newVal === value) {
+        return
+      }
+      if (process.env.NODE_ENV !== 'production' && customSetter) {
+        customSetter()
+      }
+      if (setter) {
+        setter.call(obj, newVal)
+      } else {
+        val = newVal
+      }
+      childOb = observe(newVal)
+      dep.notify()
+    }
+  })
+}
+```
+**Object.defineProperty(obj, prop, descriptor)**中的第三个参数就是对象描述符。对象描述符的传入是有要求的，分为赋值描述符合存取描述符。而每次传入的参数只能是其中之一，很显然在**defineReactive**中传入的就是存取描述符，在传入的存取描述符对象中有get,set方法。set方法会实例化一个**Observer**,get方法会关联到一个**class Dep**的实例。但是仔细看get方法，发现只有在**Dep.target**值为true的时候才会发生关联。所以，接下来分析一下**class Dep**的源码。
+```
+export default class Dep {
+  static target: ?Watcher;
+  id: number;
+  subs: Array<Watcher>;
+  constructor () {
+    this.id = uid++
+    this.subs = []
+  }
+  addSub (sub: Watcher) {
+    this.subs.push(sub)
+  }
+  removeSub (sub: Watcher) {
+    remove(this.subs, sub)
+  }
+  depend () {
+    if (Dep.target) {
+      Dep.target.addDep(this)
+    }
+  }
+  notify () {
+    const subs = this.subs.slice()
+    for (let i = 0, l = subs.length; i < l; i++) {
+      subs[i].update()
+    }
+  }
+}
+Dep.target = null
+const targetStack = []
+export function pushTarget (_target: Watcher) {
+  if (Dep.target) targetStack.push(Dep.target)
+  Dep.target = _target
+}
+export function popTarget () {
+  Dep.target = targetStack.pop()
+}
+```
+**class Dep**就是连接**class Observer**和**class Watch**类的介质。因为在set方法里面最终会调用`dep.notify()`方法。**class Dep**类中的**notify**方法会使这个dep实例下所有的watch数组更新一次。**class Watch**类的**update**方法会调用对应的回调方法，进行对应的更新。同时在前面提到的get方法关联**class Dep**实例时，是在**Dep.target**为true的时候才会执行。通过源码可以看到**Dep.target**的初始值是null,也就是默认是不会执行关联的。源码上对此做了注释，可以看到**Dep.target**是被赋予全局性质，用来保证同一时刻只有一个**Watcher**实例在被‘关联’（源码注释的地方是'evaluated'）。而激活**Dep.target**这个属性的是函数**pushTarget**。**pushTarget**函数就在**class Watcher**中调用了。**class Watcher**的源码如下：
+```
+export default class Watcher {
+  vm: Component;
+  expression: string;
+  cb: Function;
+  id: number;
+  deep: boolean;
+  user: boolean;
+  lazy: boolean;
+  sync: boolean;
+  dirty: boolean;
+  active: boolean;
+  deps: Array<Dep>;
+  newDeps: Array<Dep>;
+  depIds: Set;
+  newDepIds: Set;
+  getter: Function;
+  value: any;
+  constructor (
+    vm: Component,
+    expOrFn: string | Function,
+    cb: Function,
+    options?: Object = {}
+  ) {
+    this.vm = vm
+    vm._watchers.push(this)
+    // options
+    this.deep = !!options.deep
+    this.user = !!options.user
+    this.lazy = !!options.lazy
+    this.sync = !!options.sync
+    this.expression = expOrFn.toString()
+    this.cb = cb
+    this.id = ++uid // uid for batching
+    this.active = true
+    this.dirty = this.lazy // for lazy watchers
+    this.deps = []
+    this.newDeps = []
+    this.depIds = new Set()
+    this.newDepIds = new Set()
+    if (typeof expOrFn === 'function') {
+      this.getter = expOrFn
+    } else {
+      this.getter = parsePath(expOrFn)
+      if (!this.getter) {
+        this.getter = function () {}
+        process.env.NODE_ENV !== 'production' && warn(
+          `Failed watching path: "${expOrFn}" ` +
+          'Watcher only accepts simple dot-delimited paths. ' +
+          'For full control, use a function instead.',
+          vm
+        )
+      }
+    }
+    this.value = this.lazy
+      ? undefined
+      : this.get()
+  }
+  get () {
+    pushTarget(this)
+    const value = this.getter.call(this.vm, this.vm)
+    if (this.deep) {
+      traverse(value)
+    }
+    popTarget()
+    this.cleanupDeps()
+    return value
+  }
+ }
+```
+到这里，**class Observer**、**class Dep**和**class Watch**三个类的关系就清楚了。这也是Vue中实现数据绑定用到的观察者模式的体现。   
+
+### Virtual-dom
+[**React**](https://facebook.github.io/react/docs/hello-world.html)的大热，是因为其带来了'Virtual-dom'和数据驱动视图的理念（尽管很多人觉得后者更重要）。这里并不想比较**'Virtual-dom'**和原生的DOM操作谁快谁慢的问题（事实上在dom结构改动很多的情况下，原生DOM操作比较快。。。）,仅仅是理解一下**'Virtual-dom'**。    
+**'Virtual-dom'**是一系列的模块集合，用来提供声明式的DOM渲染。来看一个简单的DOM片段
+```
+<div id="parent">
+ <span class="child">item1</span>
+ <span class="child">item2</span>
+ <span class="child">item3</span>
+</div>
+```
+对DOM片段结构抽象一下：一个根节点div,三个元素子节点span(对应的内部文本节点)。然后用JavaScript对象表示：
+```
+const dom = {
+  tagName: 'div', 
+  props: { 
+     id: 'parent'
+  },
+  children: [ 
+     {tagName: 'span', props: {class: 'child'}, children: ["item1"]},
+     {tagName: 'span', props: {class: 'child'}, children: ["item2"]},
+     {tagName: 'span', props: {class: 'child'}, children: ["item3"]},
+   ]
+}
+```
+进而扩展到整个HTML页面的结构。整个HTML页面结构其实可以用一个JavaScript对象表示，通过这个抽象，对`dom`对象的修改就会影响到HTML页面的结构。所以在改变HTML结构的时候，我们仅仅是修改JavaScript对象。相对以前修改HTML页面结构式通过直接修改DOM元素，现在变成修改对应的JavaScript对象。Vue.js在对DOM的抽象做的更细致，具体代码可以看`core/vdom/create-element.js`。   
+
+在实现了对HTML结构的映射后，接下来就是**'Virtual-dom'**的重点，如何比较两个不同HTML结构树的对象--`diff`算法。`diff`算法比较的就是两颗'树'的差异。而传统的'树'比较是一个[时间复杂度](https://zh.wikipedia.org/wiki/%E6%97%B6%E9%97%B4%E5%A4%8D%E6%9D%82%E5%BA%A6)为O(n^3)，这个效率明显是不够的。而HTML的结构树的改变不同于传统的'树'。HTML结构树的改变，很少会出现跨越不同层级的改变。基于这个实际上的差异化改变，**'Virtual-dom'**的`diff`算法的时间复杂度是O(n)。有兴趣研究`diff`算法的，可以看下[这里](https://github.com/Matt-Esch/virtual-dom)。    
+
+在解决了`diff`算法核心问题后，就要把'新HTML结构树'相对'老HTML结构树'的差异应用到'老HTML结构树'上--'patch'。Vue.js在'patch'的解决方案上参考了开源项目[Snabbdom](https://github.com/snabbdom/snabbdom)。源码篇幅有点长，也有些复杂，想深入了解的可以配合开源的项目一起分析。    
+
+至此，**'Virtual-dom'**大致的实现逻辑也清楚了。Vue.js的源码在架构组织上还有很多可以学习的，比如区分'核心模块'和'平台模块'。另外内部实现的'keep-alive'组件也是值得关注的地方，更多了解请到[这里](https://github.com/vuejs/vue/tree/master/src)。以上只是很'粗浅'的学习，不对的地方希望大家指出来（认真脸.jpg）。
+
+
+### 参考资料
+[Vue官网文档](http://cn.vuejs.org/v2/guide/)     
+[What is Virtual Dom](https://medium.com/cardlife-app/what-is-virtual-dom-c0ec6d6a925c#.3vgs4yv49)   
+[The difference between Virtual DOM and DOM](http://reactkungfu.com/2015/10/the-difference-between-virtual-dom-and-dom/)
+
+
+
+
+
+
+
