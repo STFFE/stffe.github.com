@@ -201,7 +201,7 @@ function diff(a, b) {
 
 `patch` 是一个补丁对象，最终的结构如下
 
-```javascript
+```Javascript
 patch = {
   0: {VPatch},
   1: {VPatch},
@@ -592,13 +592,13 @@ var newItems = [
 
 这个阶段的原则是，按照 `oldChildren` 子节点的 `key` 类型顺序，将 `newChildren` 还原回去。如旧子节点 `key` 顺序为
 
-```javascript
+```Javascript
 [非key, key1, 非key, key2]
 ```
 
 `oldChildren` 第一个节点为无 `key` 节点，对应的 `newChildren` 中的第一个无 `key` 节点为 `b2` 。接着 `oldChildren` 第二个节点为 `key1` 节点，`newChildren` 中的 `key1` 节点为 `b1`。依次类推，得出 `simulateChildren` 数组为
 
-```javascript
+```Javascript
 [b2, b1, b4, null]
 ```
 
@@ -608,7 +608,7 @@ var newItems = [
 
 在上面阶段，只是完成了按照旧节点 `key` 类型顺序，将新节点进行了一个还原。但对于新节点中的新 `key` 类型节点并没有处理。这个阶段则是将新 `key` 类型的节点，插到 `simulateChildren` 结尾。
 
-```javascript
+```Javascript
 [b2, b1, b4, null, b3]
 ```
 
@@ -616,7 +616,7 @@ var newItems = [
 
 这一步算法还是有点绕，建议直接看源码，一步步来观察转换的过程（其实就是我文字太弱，表达不清楚。 = =）。总结起来就是，如何将 `simulateChildren`的 `key` 类型顺序 转换成 `newChildren` 的 `key` 类型顺序的过程。
 
-```javascript
+```Javascript
 [非key, key1, 非key, null, key3] ==> [key1, 非key, key3, 非key]
 ```
 
