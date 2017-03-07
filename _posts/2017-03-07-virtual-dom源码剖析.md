@@ -2,7 +2,7 @@
 layout: post
 title: 对 virtual-dom 的一些理解
 category: Javascript
-date:   2017-02-20
+date:   2017-03-07
 author: "雨鸟"
 homepage: "axemea.github.io/javascript/2017/02/20/virtual-dom%E6%BA%90%E7%A0%81%E5%89%96%E6%9E%90.html"
 ---
