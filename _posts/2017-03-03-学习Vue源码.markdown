@@ -4,7 +4,7 @@ title:  "学习Vue.js源码"
 date:   2017-03-03
 categories: Vue
 author: "Fedora"
-homepage: "http://luzuoquan.github.io/2017/03/02/%E5%AD%A6%E4%B9%A0Vue%E6%BA%90%E7%A0%81/"
+homepage: "luzuoquan.github.io/2017/03/02/%E5%AD%A6%E4%B9%A0Vue%E6%BA%90%E7%A0%81/"
 ---
 ### 前言
 Vue.js是目前MVVM框架中比较流行的一种，在之前的项目中也用过Vue+Vuex。在使用的过程中，也是一边看文档一边进行开发。对Vue的了解也仅限官方文档和一些社区上回答，很大程度上是知其然而不知其所以然。所以在项目告一段落之后，决定从Vue的源码入手，学习一下其内部架构。
