@@ -23,18 +23,21 @@ Vue.js是目前MVVM框架中比较流行的一种，在之前的项目中也用�
 6. **/sfc**目录处理单文件.vue；
 7. **/shared**目录提供全局用到的工具函数。    
 在刚学习源码时，会对类似  
-```
+
+```javascript
 export function observe (value: any): Observer | void {
   if (!isObject(value)) {
     return
   }
  }
 ```
+
 这样函数申明或者变量申明感动疑惑的，可以先了解一下[flow](https://flowtype.org/docs/getting-started.html#_)。
 
 ### 独立构建&&运行时构建
 Vue.js从2.0以后开始出现两个不同的构建版本，详情可以查看[官网文档](https://cn.vuejs.org/v2/guide/installation.html#独立构建-vs-运行时构建)。一开始说到这个，是因为从Vue的build命令里面可以看到有7个build版本，这对学习其源码非常有帮助。
-```
+
+```javascript
 const builds = {
   // Runtime only (CommonJS). Used by bundlers e.g. Webpack & Browserify
   'web-runtime-dev': {
@@ -96,6 +99,7 @@ const builds = {
   }
 }
 ```
+
 这里，关注的重点是runtime的版本。
 
 ### Vue.js结构
@@ -111,7 +115,8 @@ Vue.js实现数据绑定的关键是**Object.defineProperty(obj, prop, descripto
 Vue源码对此实现的逻辑在core/observer目录下。
 关注三个类**class Observer**,**class Dep**,**class Watcher**     
 **class Observer**在core/observer/index.js中
-```
+
+```javascript
 export class Observer {
   value: any;
   dep: Dep;
@@ -145,8 +150,10 @@ export class Observer {
   }
 }
 ```
+
 Observer类实例是用来附加到每个被观察的对象（后面称之为响应式对象）上的。普通对象通常是不会变成‘响应式对象’的。经过**defineReactive**函数的调用,才会将传入的普通对象变成‘响应式对象’。而**defineReactive**就是利用了**Object.defineProperty**这个方法。**defineReactive**源码如下：
-```
+
+```javascript
 export function defineReactive (
   obj: Object,
   key: string,
@@ -198,8 +205,10 @@ export function defineReactive (
   })
 }
 ```
+
 **Object.defineProperty(obj, prop, descriptor)**中的第三个参数就是对象描述符。对象描述符的传入是有要求的，分为赋值描述符合存取描述符。而每次传入的参数只能是其中之一，很显然在**defineReactive**中传入的就是存取描述符，在传入的存取描述符对象中有get,set方法。set方法会实例化一个**Observer**,get方法会关联到一个**class Dep**的实例。但是仔细看get方法，发现只有在**Dep.target**值为true的时候才会发生关联。所以，接下来分析一下**class Dep**的源码。
-```
+
+```javascript
 export default class Dep {
   static target: ?Watcher;
   id: number;
@@ -236,8 +245,10 @@ export function popTarget () {
   Dep.target = targetStack.pop()
 }
 ```
+
 **class Dep**就是连接**class Observer**和**class Watch**类的介质。因为在set方法里面最终会调用`dep.notify()`方法。**class Dep**类中的**notify**方法会使这个dep实例下所有的watch数组更新一次。**class Watch**类的**update**方法会调用对应的回调方法，进行对应的更新。同时在前面提到的get方法关联**class Dep**实例时，是在**Dep.target**为true的时候才会执行。通过源码可以看到**Dep.target**的初始值是null,也就是默认是不会执行关联的。源码上对此做了注释，可以看到**Dep.target**是被赋予全局性质，用来保证同一时刻只有一个**Watcher**实例在被‘关联’（源码注释的地方是'evaluated'）。而激活**Dep.target**这个属性的是函数**pushTarget**。**pushTarget**函数就在**class Watcher**中调用了。**class Watcher**的源码如下：
-```
+
+```javascript
 export default class Watcher {
   vm: Component;
   expression: string;
@@ -307,26 +318,30 @@ export default class Watcher {
   }
  }
 ```
+
 到这里，**class Observer**、**class Dep**和**class Watch**三个类的关系就清楚了。这也是Vue中实现数据绑定用到的观察者模式的体现。   
 
 ### Virtual-dom
-[**React**](https://facebook.github.io/react/docs/hello-world.html)的大热，是因为其带来了'Virtual-dom'和数据驱动视图的理念（尽管很多人觉得后者更重要）。这里并不想比较**'Virtual-dom'**和原生的DOM操作谁快谁慢的问题（事实上在dom结构改动很多的情况下，原生DOM操作比较快。。。）,仅仅是理解一下**'Virtual-dom'**。    
+[**React**](https://facebook.github.io/react/docs/hello-world.html)的大热，是因为其带来了'Virtual-dom'和数据驱动视图的理念（尽管很多人觉得后者更重要）。这里并不想比较**'Virtual-dom'**和原生的DOM操作谁快谁慢的问题（事实上在dom结构改动很多的情况下，原生DOM操作比较快。。。）,仅仅是理解一下**`Virtual-dom`**。    
 **'Virtual-dom'**是一系列的模块集合，用来提供声明式的DOM渲染。来看一个简单的DOM片段
-```
+
+```javascript
 <div id="parent">
  <span class="child">item1</span>
  <span class="child">item2</span>
  <span class="child">item3</span>
 </div>
 ```
+
 对DOM片段结构抽象一下：一个根节点div,三个元素子节点span(对应的内部文本节点)。然后用JavaScript对象表示：
-```
+
+```javascript
 const dom = {
-  tagName: 'div', 
-  props: { 
+  tagName: 'div',
+  props: {
      id: 'parent'
   },
-  children: [ 
+  children: [
      {tagName: 'span', props: {class: 'child'}, children: ["item1"]},
      {tagName: 'span', props: {class: 'child'}, children: ["item2"]},
      {tagName: 'span', props: {class: 'child'}, children: ["item3"]},
@@ -346,10 +361,3 @@ const dom = {
 [Vue官网文档](http://cn.vuejs.org/v2/guide/)     
 [What is Virtual Dom](https://medium.com/cardlife-app/what-is-virtual-dom-c0ec6d6a925c#.3vgs4yv49)   
 [The difference between Virtual DOM and DOM](http://reactkungfu.com/2015/10/the-difference-between-virtual-dom-and-dom/)
-
-
-
-
-
-
-

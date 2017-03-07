@@ -5,11 +5,10 @@ layout: default
 <div class="home">
   <ul class="post-list">
     {% for post in site.posts %}
-      <li>
-        <br>
-        <h3>
+      <li class="post">
+        <h2 class="title">
           <a class="post-link" href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a>
-        </h3>
+        </h2>
         <span class="post-meta">{{ post.date | date: "%Y-%-m-%-d" }}</span>
         <a href="http://{{ post.homepage }}" class="author">{{ post.author }}</a>
         <hr id="line">

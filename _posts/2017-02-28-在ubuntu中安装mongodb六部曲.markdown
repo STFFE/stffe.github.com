@@ -15,9 +15,11 @@ author: "兰悦儿格格"
 
 ## 1. 根据包管理系统来导入公钥
  这里的包管理系统指的就是你的包管理工具是**dpkg** 还是 **apt** ,或者是其他的包管理工具.
+
 ```
 sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv EA312927
 ```
+
 这个公钥呢，就是酱紫
 > -----BEGIN PGP PUBLIC KEY BLOCK-----
 Version: GnuPG v1.4.11 (GNU/Linux)
@@ -53,25 +55,31 @@ YXy2T09NgATr0A==
 
 ## 2. 创建 MongoDB 的一个列表文件（注意，这里系统不同，安装代码也不同）
 如果你的 ubuntu 系统是 **16.04** ，执行下面这个就好
+
 ```
 echo "deb http://repo.mongodb.org/apt/ubuntu xenial/mongodb-org/3.2 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-3.2.list
 ```
+
 但是如果你的系统是 **14.04** 系列的，那就得执行这个了
+
 ```
 echo "deb http://repo.mongodb.org/apt/ubuntu trusty/mongodb-org/3.2 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-3.2.list
 ```
 
 想了想，还是把 12 的也附上吧
-```
-echo "deb http://repo.mongodb.org/apt/ubuntu precise/mongodb-org/3.2 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-3.2.list
 
 ```
+echo "deb http://repo.mongodb.org/apt/ubuntu precise/mongodb-org/3.2 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-3.2.list
+```
+
 ## 3. 更新本地安装包的数据源
+
 ```
 sudo apt-get update
 ```
 
 ## 4. 安装 MongoDB 包
+
 ```
 sudo apt-get install -y mongodb-org
 ```
@@ -82,10 +90,11 @@ sudo apt-get install -y mongodb-org
 
 > A metapackage that will automatically install the four component packages listed below.
 这里就说了。它跟着就会自动安装其他四个包，所以你只要选择，安装这一个包就够了
-另外， **/etc/mongod.conf** 配置文件会默认把你 这个包的 **bind_ip** 设置成 **127.0.0.1** 
+另外， **/etc/mongod.conf** 配置文件会默认把你 这个包的 **bind_ip** 设置成 **127.0.0.1**
 
 ## 5. 创建一个系统服务文件
 在 /lib/systemed/system 创建一个 mongod.service 文件，文件内容如下
+
 ```
 [Unit]
 Description=High-performance, schema-free document-oriented database
@@ -101,43 +110,52 @@ ExecStart=/usr/bin/mongod --quiet --config /etc/mongod.conf
 WantedBy=multi-user.target
 ```
 
-## 6.运行 MongoDB 
+## 6.运行 MongoDB
 ### 开始运行
+
 ```
 sudo servercie mongod start
 ```
 
 ### 验证 Mongodb 是否开启成功
 在**/var/log/mongodb/mongod.log**查看是否有这么一句话
+
 ```
 [initandlisten] waiting for connections on port <port>
 ```
 
 果然在mongod.log的最新的日志信息里找到了这么一句话
+
 ```
 2016-11-21T05:53:34.772-0500 I NETWORK  [initandlisten] waiting for connections on port 27017
 ```
-### 停止 MongoDB 
+
+### 停止 MongoDB
+
 ```
 sudo service mongod stop
 ```
 
 ### 重启
+
 ```
  sudo service mongod restart
 ```
 
 ok。那怎么校验你是否安装成功，MongoDB 已经能用了呢？
 在你的命令行里输入
+
 ```
 mongo
 ```
+
 这个时候当你看到类似这样的输出之后就代表已经 ok 了
+
 ```
 MongoDB shell version: 3.2.9
 connecting to: test
-Server has startup warnings: 
-2016-11-21T05:53:34.769-0500 I CONTROL  [initandlisten] 
+Server has startup warnings:
+2016-11-21T05:53:34.769-0500 I CONTROL  [initandlisten]
 2016-11-21T05:53:34.769-0500 I CONTROL  [initandlisten] ** WARNING: You are running in OpenVZ which can cause issues on versions of RHEL older than RHEL6.
-2016-11-21T05:53:34.769-0500 I CONTROL  [initandlisten] 
+2016-11-21T05:53:34.769-0500 I CONTROL  [initandlisten]
 ```
