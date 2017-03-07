@@ -51,14 +51,14 @@ homepage: "axemea.github.io/javascript/2017/02/20/virtual-dom%E6%BA%90%E7%A0%81%
 
 旅程从 `virtual-hyperscript/index.js` 中开始。
 
-```Javascript
+```javascript
 // @virtual-hyperscript/index.js
 tag = parseTag(tagName, props);
 ```
 
 由于 `tagName` 支持 `#ID`, `div`, `.class`, `div#ID` 等形式，第一步，进行解析。
 
-```Javascript
+```javascript
 // @virtual-hyperscript/parse-tag.js
 var classIdSplit = /([\.#]?[a-zA-Z0-9\u007F-\uFFFF_:-]+)/;
 
@@ -72,14 +72,14 @@ if (notClassId.test(tagParts[1])) {
 
 这里比较巧妙，通过匹配 `class` 和 `id` 的组合正则对 `tagName` 进行分隔，得到一个数组，一次性将标签，类名， `id` 抽离出来。之后分别对其进行预处理。最后一步
 
-```Javascript
+```javascript
 // @virtual-hyperscript/parse-tag.js
 return props.namespace ? tagName : tagName.toUpperCase();
 ```
 
 这里牵扯出一个 `namespace` 的概念，可能在平时多接触 `HTML` 对于这个概念比较陌生，但如果了解 `XML` 的话，这个概念还是挺重要的，可以用来避免元素名冲突。有兴趣的可以[自行了解](https://www.w3schools.com/xml/xml_namespaces.asp)下，这里不展开介绍。继续往下。
 
-```Javascript
+```javascript
 // @virtual-hyperscript/index.js
 transformProperties(props);
 
@@ -92,14 +92,14 @@ if (children !== undefined && children !== null) {
 
 接着就可以生成主角 `VNode` 对象了。
 
-```Javascript
+```javascript
 // @virtual-hyperscript/index.js
 return new VNode(tag, props, childNodes, key, namespace);
 ```
 
 这个 `VNode` 里面都发生了啥？
 
-```Javascript
+```javascript
 // @vnode/vnode.js
 // 部分逻辑简化
 for (var propName in properties) {
@@ -149,7 +149,7 @@ for (var i = 0; i < count; i++) {
 
 ### 4. createElement - 创建 `dom` 节点
 
-```Javascript
+```javascript
 // @vdom/create-element.js
 vnode = handleThunk(vnode).a
 
@@ -162,7 +162,7 @@ if (isWidget(vnode)) {
 
 `createElement` 支持传 `Thunk` ，为了统一拿到 `VNode` ，`handleThunk` 首先做兼容处理。可以理解为 `handleThunk(vnode, null)`。接着，处理掉两个和 `dom` 直接相关的两种类型 `Widget` 和 `Text`。特殊 `case` 处理完了，接着就应该是如何处理 `VNode` 了。
 
-```Javascript
+```javascript
 // @vdom/create-element.js
 var node = (vnode.namespace === null) ?
     doc.createElement(vnode.tagName) :
@@ -190,7 +190,7 @@ for (var i = 0; i < children.length; i++) {
 
 ### 4. diff - 比较新旧两个 `VNode`
 
-```Javascript
+```javascript
 // @vtree/diff.js
 function diff(a, b) {
   var patch = { a: a }
@@ -201,7 +201,7 @@ function diff(a, b) {
 
 `patch` 是一个补丁对象，最终的结构如下
 
-```Javascript
+```javascript
 patch = {
   0: {VPatch},
   1: {VPatch},
@@ -216,7 +216,7 @@ patch = {
 
 为了方便理解，可以这么描述，`walk` 是用来对比 `a` `b` 两个新旧虚拟节点，如检测到 `index` 节点有状态更新，则将 `VPatch` 打到 `patch[index]` 上。
 
-```Javascript
+```javascript
 // @vtree/diff.js
 function walk(a, b, patch, index) {
     // 全等则直接返回
@@ -318,7 +318,7 @@ function walk(a, b, patch, index) {
 
 `walk` 方法并没有返回值，由于 `patch` 是传引用，直接对它进行了修改。这里需要着重说明的是 `diffChildren` 方法，它主要用来遍历和递归子节点。
 
-```Javascript
+```javascript
 // @vtree/diff.js
 function diffChildren(a, b, patch, apply, index) {
     var aChildren = a.children
@@ -382,7 +382,7 @@ function diffChildren(a, b, patch, apply, index) {
 
 `patch` 主要关注 `patchRecursive` 。
 
-```Javascript
+```javascript
 // @vdom/patch.js
 function patchRecursive(rootNode, patches, renderOptions) {
     var indices = patchIndices(patches)
@@ -412,14 +412,14 @@ function patchRecursive(rootNode, patches, renderOptions) {
 
 通过前面的讲述知道，`patches`对象的数字 `key` 为节点索引，`value` 为相应的 `VPatch`， 这里，先通过 `patchIndices` 方法将索引取出组成数组 `indices`。接着通过 `domIndex` 方法将节点索引和对应的 `dom` 节点映射上，生成 `index` 对象。在 `domIndex` 方法中有个细节需要提一下。
 
-```Javascript
+```javascript
 // @vdom/dom-index.js
 indices.sort(ascending)
 ```
 
 可能大家会想了，`patches` 对象中不都已经是这样的吗？
 
-```Javascript
+```javascript
 {
   0: { ... },
   1: { ... },
@@ -434,7 +434,7 @@ indices.sort(ascending)
 
 接着通过在 `applyPatch` 中，调用 `patchOp` 给节点打上相应的 `patche`，也就是对 `dom` 进行操作。部分代码如下，结构较简单，这里就不多说了。
 
-```Javascript
+```javascript
 // @vdom/patch-op.js
 function applyPatch(vpatch, domNode, renderOptions) {
     var type = vpatch.type
@@ -507,7 +507,7 @@ items = {
 
 方法的最开始，进行了两个特殊逻辑判断。
 
-```Javascript
+```javascript
 // @vtree/diff.js
 ...
 
@@ -530,7 +530,7 @@ if (aFree.length === aChildren.length) {
 
 其实，我们大多数时候不加 `track-by` 列表循环，在这里就直接 `return` 了。这时，是否会有疑惑，这样不就足够了吗，直接返回新的子节点，然后按次序和旧子节点进行对比，对结果也不会有影响。我们来考虑下下面这个栗子。
 
-```Javascript
+```javascript
 var oldItems = [
   {
     uid: '1',
@@ -592,13 +592,13 @@ var newItems = [
 
 这个阶段的原则是，按照 `oldChildren` 子节点的 `key` 类型顺序，将 `newChildren` 还原回去。如旧子节点 `key` 顺序为
 
-```Javascript
+```javascript
 [非key, key1, 非key, key2]
 ```
 
 `oldChildren` 第一个节点为无 `key` 节点，对应的 `newChildren` 中的第一个无 `key` 节点为 `b2` 。接着 `oldChildren` 第二个节点为 `key1` 节点，`newChildren` 中的 `key1` 节点为 `b1`。依次类推，得出 `simulateChildren` 数组为
 
-```Javascript
+```javascript
 [b2, b1, b4, null]
 ```
 
@@ -608,7 +608,7 @@ var newItems = [
 
 在上面阶段，只是完成了按照旧节点 `key` 类型顺序，将新节点进行了一个还原。但对于新节点中的新 `key` 类型节点并没有处理。这个阶段则是将新 `key` 类型的节点，插到 `simulateChildren` 结尾。
 
-```Javascript
+```javascript
 [b2, b1, b4, null, b3]
 ```
 
@@ -616,7 +616,7 @@ var newItems = [
 
 这一步算法还是有点绕，建议直接看源码，一步步来观察转换的过程（其实就是我文字太弱，表达不清楚。 = =）。总结起来就是，如何将 `simulateChildren`的 `key` 类型顺序 转换成 `newChildren` 的 `key` 类型顺序的过程。
 
-```Javascript
+```javascript
 [非key, key1, 非key, null, key3] ==> [key1, 非key, key3, 非key]
 ```
 
