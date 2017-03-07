@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "2017-02-28-在ubuntu中安装mongodb六部曲"
+title:  "在ubuntu中安装mongodb六部曲"
 date:   2017-02-28
 categories: DB
 author: "兰悦儿格格"

@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "2017-03-03-学习Vue.js源码"
+title:  "学习Vue.js源码"
 date:   2017-03-03
 categories: Vue
 author: "Fedora"
