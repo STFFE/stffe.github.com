@@ -7,7 +7,6 @@ author: "walkon"
 homepage: "https://github.com/tianjianchn"
 ---
 
-# updatex，更原生的 Immutable 操作方式
 [updatex](https://github.com/tianjianchn/updatex)，安全、高效地使用原生语法（如赋值 `obj.k = v`、`arr.push()`等）来达到 Immutability（不可变性）。  
 先来看一段代码：  
 ```js
@@ -52,7 +51,7 @@ obj2.a.x = 't';
 这就是 [updatex](https://github.com/tianjianchn/updatex) 要做的事情。
 
 ## 原理
-结合最开始的示例与前面的来由描述，[updatex](https://github.com/tianjianchn/updatex) 的内部机制已经有了一个轮廓了。
+结合最开始的示例与前面的来由描述，[updatex](https://github.com/tianjianchn/updatex) 的内部机制已经有一个轮廓了。
 1. 当调用 `updatex(obj, updater)` 时，通过 `Object.freeze` 冻结整个原对象。这样任何对原对象的误操作（修改）都会抛出异常。
 2. 当调用 `select(path)` API 时，整个路径（`path`）内的节点都会通过 `...` 来进行浅拷贝。这样你就可以对路径上的任何节点使用原生语法来操作数据了。
 
@@ -77,6 +76,6 @@ updatex(obj, (newObj) => {
 ```
 
 ## 特性
-1. 默认情况下，冻结只会发生在开发环境。在生产环境（`process.env.NODE_ENV=production`）会自动停用以提升部分性能。一个在开发环境上充分测试的代码，停用冻结应该不会导致生产环境上异常修改的情况发生。
+1. 默认情况下，冻结只会发生在开发环境。在生产环境（`process.env.NODE_ENV=production`）会自动停用以提升部分性能（以及避免某些环境不支持 `Object.freeze`）。一个在开发环境上充分测试的代码，停用冻结应该不会导致生产环境上意外修改的情况发生。
 2. 在 `updater` 返回时，会检查所有 `select` 的路径。如果有过度选择（over-select，即选取了但值最终没有发生变化）的话，会有警告。
 3. `updater` 里的所有修改操作可以视作处于批量模式下，而不是修改一次就复制一次对象。自然，也就不需要重新赋值（像 `obj = obj.set()`)，不需要 `return newObj` 了
