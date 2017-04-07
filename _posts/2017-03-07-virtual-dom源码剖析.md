@@ -188,7 +188,7 @@ for (var i = 0; i < children.length; i++) {
 
 -----------
 
-### 4. diff - 比较新旧两个 `VNode`
+### 5. diff - 比较新旧两个 `VNode`
 
 ```javascript
 // @vtree/diff.js
@@ -378,7 +378,7 @@ function diffChildren(a, b, patch, apply, index) {
 -----------
 
 
-### 5. patch - 将 `diff` 对比出的 `patch` 更新到相应的 `dom` 节点上
+### 6. patch - 将 `diff` 对比出的 `patch` 更新到相应的 `dom` 节点上
 
 `patch` 主要关注 `patchRecursive` 。
 
@@ -457,7 +457,7 @@ function applyPatch(vpatch, domNode, renderOptions) {
 -----------
 
 
-### 6. reorder - 重新排序
+### 7. reorder - 重新排序
 
 `reorder` 会用在哪些场景呢，以 `Vue` 的语法，举几个栗子。
 
@@ -630,7 +630,7 @@ var newItems = [
 -----------
 
 
-### 7. 后话
+### 8. 后话
 
 到此为止 `virtual-dom` 的大体过程也说的差不多了。（这是真要结束了。）
 
