@@ -4,7 +4,7 @@ title: updatex，更原生的 Immutable 操作方式
 category: Javascript
 date: 2017-04-06
 author: "walkon"
-homepage: "https://github.com/tianjianchn"
+homepage: "github.com/tianjianchn"
 ---
 
 ## 来由
