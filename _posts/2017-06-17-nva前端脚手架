@@ -1,9 +1,10 @@
 ---
 layout: post
-title:  "nva - 简洁高效的前端项目脚手架"
-date:   2017-03-03
-categories: Node
+title: nva - 简洁高效的前端项目脚手架
+category: Node
+date: 2017-06-17
 author: "奈之若何"
+homepage: ""
 ---
 
 ## nva是什么?
